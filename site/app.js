@@ -65,6 +65,10 @@ function humanFeature(feature) {
 function fmtValue(feature, value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "n/a";
   if (Math.abs(value) >= 100) return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  if (value !== 0 && Math.abs(value) < 0.01) {
+    const text = Number(value).toPrecision(2);
+    return text.includes("e") ? text : text.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+  }
   return Number(value).toFixed(3);
 }
 
