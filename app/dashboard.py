@@ -268,16 +268,20 @@ with tab_perf:
         st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Which modalities earn their place?")
-    abl = metrics.sort_values("auc")
+    abl = metrics.sort_values("val_auc")
     fig = go.Figure(go.Bar(
-        x=abl.auc, y=abl.model, orientation="h",
-        marker_color=["#0f766e" if m == "late_pre_text_ac" else "#cbd5e1" for m in abl.model],
+        x=abl.auc, y=abl.model.map(lambda m: MODEL_NAMES.get(m, m)), orientation="h",
+        marker_color=["#0f766e" if m == best.model else "#cbd5e1" for m in abl.model],
         text=abl.auc.round(3), textposition="outside",
     ))
     fig.update_layout(height=320, xaxis={"range": [0.45, 0.85], "title": "Test ROC-AUC"},
                       margin={"l": 10, "r": 30, "t": 10, "b": 10})
     st.plotly_chart(fig, use_container_width=True)
-    st.caption("Voice alone is close to chance. Text adds about one point of AUC over pre-call volatility; the stack adds another half point. Language carries the signal, not prosody.")
+    st.caption(
+        "Pre-call volatility does most of the work. Text has standalone signal but adds about 0.001 AUC "
+        "over the baseline; adding voice lowers test AUC. Language carries what little incremental signal "
+        "there is, not hand-crafted prosody."
+    )
 
     st.subheader("Top features by gain")
     top = fi.head(15).sort_values("gain")
@@ -298,9 +302,9 @@ with tab_method:
         "- **MAEC** (CIKM 2020): 3,443 earnings calls from S&P 1500 companies, each with a transcript and 29 "
         "acoustic descriptors per segment. CC BY-SA 4.0; not redistributed here.\n"
         "- **Prices**: daily closes from yfinance; SPY as the market benchmark.\n"
-        "- **Labels**: top tercile of post-call realised volatility, where volatility is measured over the five "
-        "trading days after the call and divided by the sixty days before it, market-adjusted. The threshold is "
-        "learned on the training period only."
+        "- **Labels**: top tercile of post-call realised volatility, measured over the five trading days after "
+        "the call, market-adjusted against SPY. The threshold is learned on the training period only. A "
+        "post/pre ratio target was tested and rejected because it removes the predictable volatility level."
     )
     st.subheader("Protocol")
     st.markdown(
@@ -312,11 +316,12 @@ with tab_method:
     )
     st.subheader("What the ablation says")
     st.markdown(
-        "Pre-call volatility is a strong baseline (0.770 AUC), because volatility clusters. Text adds a small, "
-        "consistent lift (0.776 without voice, 0.780 with it). Voice alone is 0.543 — close to chance. That is a "
-        "real finding, not a bug: hand-crafted prosody features do not generalise across speakers and recording "
-        "conditions, and the label is dominated by market-wide moves. A production system would need speaker-"
-        "normalised audio embeddings and a cleaner surprise label."
+        "Pre-call volatility is a strong baseline (0.776 test AUC), because volatility clusters. Text alone "
+        "reaches 0.674, but adds only about 0.001 AUC on top of the baseline. Voice alone is 0.543 — close to "
+        "chance — and adding it lowers test AUC from 0.780 to 0.776. That is a real finding, not a bug: "
+        "hand-crafted prosody features do not generalise across speakers and recording conditions, and the "
+        "label is dominated by market-wide moves. A production system would need speaker-normalised audio "
+        "embeddings and a cleaner surprise label."
     )
     st.subheader("Limitations")
     st.markdown(
