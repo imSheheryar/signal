@@ -123,8 +123,8 @@ function renderCall(callId) {
 
   $("outcome").textContent = call.outcome;
   $("vols").textContent = `Post-call vol ${pct(call.post_vol)} · pre-call ${pct(call.pre_vol)}`;
-  $("baselinePre").innerHTML = `Pre-call volatility: <strong>${pct(call.pred_pre_vol)}</strong>`;
-  $("baselineOther").textContent = `Text only ${pct(call.pred_text)} · Voice only ${pct(call.pred_voice)}`;
+  $("baselinePre").innerHTML = `Pre-call baseline: <strong>${pct(call.pred_pre_vol)}</strong>`;
+  $("baselineOther").textContent = `Text-only baseline ${pct(call.pred_text)} · Voice-only baseline ${pct(call.pred_voice)}`;
   $("transcript").textContent = call.snippet;
 
   const drivers = call.drivers || [];

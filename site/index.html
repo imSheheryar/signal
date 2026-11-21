@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Signal — earnings-call volatility nowcast</title>
   <meta name="description" content="A multimodal earnings-call volatility nowcast with honest text, voice and FinBERT ablations.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -74,7 +75,7 @@
           </div>
 
           <div class="card">
-            <span class="stat-label">Baselines</span>
+            <span class="stat-label">Model baselines</span>
             <p class="baseline" id="baselinePre">—</p>
             <p class="muted" id="baselineOther">—</p>
             <p class="muted">Predicted probability of a high-volatility call</p>
@@ -84,7 +85,7 @@
         <div class="explorer-main">
           <div class="section-head">
             <h2>What drives the score</h2>
-            <p class="muted">SHAP contributions from the fusion model. Positive pushes toward high volatility.</p>
+            <p class="muted">SHAP contributions from the single LightGBM model (diagnostic). The risk score is a calibrated late-fusion blend. Positive values push toward high volatility.</p>
           </div>
           <div class="drivers" id="drivers"></div>
 

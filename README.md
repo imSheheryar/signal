@@ -115,7 +115,7 @@ python build_site.py          # site/data.json for the static dashboard
 streamlit run app/dashboard.py
 ```
 
-The dashboard runs at `http://localhost:8501`. The API runs with `uvicorn app.api:app --reload`; its interactive docs are at `http://localhost:8000/docs`.
+The Streamlit dashboard runs at `http://localhost:8501`; preview the static build with `python -m http.server 8080 --directory site`. The API runs with `uvicorn app.api:app --reload`; its interactive docs are at `http://localhost:8000/docs`.
 
 Run the checks with `pytest -q` and `ruff check src tests app`.
 
@@ -157,8 +157,8 @@ signal/
 
 The API is read-only and serves the evaluated test set: `/health`, `/calls`, `/calls/{call_id}` and `/metrics`. It does not pretend to score an arbitrary transcript, because a real call needs acoustic features and a price history that a text string cannot supply.
 
-- **Live dashboard:** [imsheheryar.github.io/signal](https://imsheheryar.github.io/signal/) is a static mirror of the Streamlit explorer, deployed by `.github/workflows/pages.yml`. It embeds the same 449 calls, SHAP drivers, prosody traces and metrics, so no server is required.
-- **Full Streamlit app:** run `streamlit run app/dashboard.py` locally. The committed demo artifacts mean no pipeline run is required.
+- **Live dashboard:** [imsheheryar.github.io/signal](https://imsheheryar.github.io/signal/) is a static site built from the same held-out artifacts and deployed by `.github/workflows/pages.yml`. It embeds the 449 calls, SHAP drivers, prosody traces and metrics, so no server is required.
+- **Streamlit app (local):** run `streamlit run app/dashboard.py` for the full interactive version. The committed demo artifacts mean no pipeline run is required.
 - **API:** `render.yaml` describes a free Render web service built from `Dockerfile.api`; the free tier sleeps after inactivity.
 - **Local containers:** `docker build -t signal .` for the dashboard and `docker build -f Dockerfile.api -t signal-api .` for the API.
 
