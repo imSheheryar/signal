@@ -13,3 +13,5 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 artifacts/*.png
+video/
+video_*_analysis_*.md

@@ -12,6 +12,12 @@
 
 Most “multimodal” portfolio projects fuse text and audio and report a single improved number. This one reports the number *and* the decomposition: pre-call volatility gets you most of the way, language adds a small and fragile lift, and hand-crafted prosody features add nothing. That negative result is the most useful thing in the repository, because it is what an honest evaluation looks like.
 
+## Watch the demo
+
+[![Signal walkthrough](docs/demo/signal-demo-poster.png)](docs/demo/signal-demo-720p.mp4)
+
+Sixty-two seconds: the held-out table, the modality ablation, and the dashboard. Click the frame to play (MP4, 13 MB).
+
 ## Headline results
 
 Held-out test set: 449 earnings calls from 2017 H2 to 2018 H1, never seen during training or model selection. Label: top tercile of market-adjusted post-call volatility (base rate 38.5%). The shipped model was chosen on **validation** AUC before the test set was scored.
@@ -132,6 +138,7 @@ signal/
 │   ├── architecture.mmd       # Mermaid source
 │   ├── architecture.png
 │   ├── dashboard.png
+│   ├── demo/                  # 62-second walkthrough + poster
 │   ├── model_performance.png
 │   └── model_card.md
 ├── exploratory/               # early experiments, not part of the pipeline
