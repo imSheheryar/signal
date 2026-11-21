@@ -6,6 +6,8 @@
 ![Tests](https://img.shields.io/badge/tests-19%20passing-0f766e)
 ![Licence](https://img.shields.io/badge/licence-MIT-0f766e)
 
+**Live dashboard:** [imsheheryar.github.io/signal](https://imsheheryar.github.io/signal/) — a static mirror of the same held-out artifacts, with call-level exploration and the full ablation table.
+
 ![Signal dashboard](docs/dashboard.png)
 
 Most “multimodal” portfolio projects fuse text and audio and report a single improved number. This one reports the number *and* the decomposition: pre-call volatility gets you most of the way, language adds a small and fragile lift, and hand-crafted prosody features add nothing. That negative result is the most useful thing in the repository, because it is what an honest evaluation looks like.
@@ -109,6 +111,7 @@ python embed_text.py
 
 python model.py               # train, calibrate, evaluate, save artifacts
 python build_demo.py          # dashboard artifacts
+python build_site.py          # site/data.json for the static dashboard
 streamlit run app/dashboard.py
 ```
 
@@ -133,6 +136,7 @@ signal/
 │   └── model_card.md
 ├── exploratory/               # early experiments, not part of the pipeline
 ├── scripts/                   # screenshot helpers for the docs
+├── site/                      # static dashboard deployed to GitHub Pages
 ├── src/signal_earnings/       # reusable label, text and evaluation functions
 ├── tests/                     # unit tests for features, labels, metrics
 ├── build_features.py
@@ -142,6 +146,7 @@ signal/
 ├── download_prices.py
 ├── embed_text.py
 ├── model.py
+├── build_site.py              # rebuild site/data.json from artifacts
 ├── Dockerfile                 # dashboard container
 ├── Dockerfile.api             # API container
 ├── render.yaml                # free-tier API deployment
@@ -152,7 +157,8 @@ signal/
 
 The API is read-only and serves the evaluated test set: `/health`, `/calls`, `/calls/{call_id}` and `/metrics`. It does not pretend to score an arbitrary transcript, because a real call needs acoustic features and a price history that a text string cannot supply.
 
-- **Dashboard:** deploy on [Streamlit Community Cloud](https://streamlit.io/cloud) with `app/dashboard.py` as the entry point. The committed demo artifacts mean no pipeline run is required.
+- **Live dashboard:** [imsheheryar.github.io/signal](https://imsheheryar.github.io/signal/) is a static mirror of the Streamlit explorer, deployed by `.github/workflows/pages.yml`. It embeds the same 449 calls, SHAP drivers, prosody traces and metrics, so no server is required.
+- **Full Streamlit app:** run `streamlit run app/dashboard.py` locally. The committed demo artifacts mean no pipeline run is required.
 - **API:** `render.yaml` describes a free Render web service built from `Dockerfile.api`; the free tier sleeps after inactivity.
 - **Local containers:** `docker build -t signal .` for the dashboard and `docker build -f Dockerfile.api -t signal-api .` for the API.
 

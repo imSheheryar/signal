@@ -63,6 +63,12 @@ LABELS = {
     "sent_negative": "FinBERT negative sentiment",
     "sent_positive": "FinBERT positive sentiment",
     "sent_neutral": "FinBERT neutral sentiment",
+    "acc_Standard deviation of period_std": "Period variability",
+    "acc_Mean period_std": "Period variability",
+    "acc_Degree of voice breaks_max": "Voice breaks",
+    "acc_Jitter local absolute_max": "Absolute jitter",
+    "dyn_Mean HNR_diffstd": "HNR change variability",
+    "dyn_Fraction of unvoiced_diffstd": "Unvoiced change variability",
 }
 
 MODEL_NAMES = {

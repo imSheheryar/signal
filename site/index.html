@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signal — earnings-call volatility nowcast</title>
+  <meta name="description" content="A multimodal earnings-call volatility nowcast with honest text, voice and FinBERT ablations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Signal home">
+      <span class="brand-mark">◉</span> Signal
+    </a>
+    <nav class="topnav" aria-label="Project links">
+      <a href="https://github.com/imSheheryar/signal" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="https://github.com/imSheheryar/signal/blob/main/docs/model_card.md" target="_blank" rel="noreferrer">Model card</a>
+      <a class="topnav-cta" href="https://github.com/imSheheryar/signal#readme" target="_blank" rel="noreferrer">Read the evaluation</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="chips">
+        <span>Multimodal</span><span>Evaluated</span><span>Reproducible</span>
+      </div>
+      <h1>Signal</h1>
+      <p class="lede">
+        Will this earnings call move the stock? A text-and-voice nowcast of post-call volatility,
+        evaluated on held-out calls from 2017–2018.
+      </p>
+      <div class="headline-grid" aria-label="Headline metrics">
+        <div><span class="stat-label">Selected model ROC-AUC</span><strong id="statAuc">—</strong></div>
+        <div><span class="stat-label">Text-only ROC-AUC</span><strong id="statText">—</strong></div>
+        <div><span class="stat-label">Voice-only ROC-AUC</span><strong id="statVoice">—</strong></div>
+        <div><span class="stat-label">Held-out calls</span><strong id="statCalls">—</strong></div>
+      </div>
+    </section>
+
+    <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+      <button class="tab is-active" role="tab" aria-selected="true" data-tab="explorer">Call explorer</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="performance">Model performance</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="method">Method &amp; limitations</button>
+    </nav>
+
+    <section class="panel is-active" id="explorer" role="tabpanel">
+      <div class="explorer-grid">
+        <aside class="controls">
+          <label class="field">
+            <span>Ticker</span>
+            <select id="tickerSelect"></select>
+          </label>
+          <label class="field">
+            <span>Call</span>
+            <select id="callSelect"></select>
+          </label>
+
+          <div class="card risk-card">
+            <span class="stat-label">Risk score</span>
+            <div class="risk-line"><strong id="riskScore">—</strong><span>/ 100</span></div>
+            <div class="risk-track"><div class="risk-fill" id="riskFill"></div></div>
+            <p class="muted" id="riskPercentile">—</p>
+          </div>
+
+          <div class="card">
+            <span class="stat-label">Actual outcome</span>
+            <strong class="outcome" id="outcome">—</strong>
+            <p class="muted" id="vols">—</p>
+          </div>
+
+          <div class="card">
+            <span class="stat-label">Baselines</span>
+            <p class="baseline" id="baselinePre">—</p>
+            <p class="muted" id="baselineOther">—</p>
+            <p class="muted">Predicted probability of a high-volatility call</p>
+          </div>
+        </aside>
+
+        <div class="explorer-main">
+          <div class="section-head">
+            <h2>What drives the score</h2>
+            <p class="muted">SHAP contributions from the fusion model. Positive pushes toward high volatility.</p>
+          </div>
+          <div class="drivers" id="drivers"></div>
+
+          <div class="section-head chart-head">
+            <h2>Delivery across the call</h2>
+            <p class="muted">Segment-level pitch and intensity. Downsampled for the web view.</p>
+          </div>
+          <div class="chart-card"><div id="prosodyChart" class="chart"></div></div>
+
+          <details class="transcript">
+            <summary>Transcript excerpt</summary>
+            <p id="transcript"></p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="performance" role="tabpanel">
+      <div class="section-head">
+        <h2>Held-out performance</h2>
+        <p class="muted">Sorted by validation AUC; the first row is the shipped model. Test set: 449 calls, 2017 H2–2018 H1.</p>
+      </div>
+      <div class="table-wrap">
+        <table id="metricsTable">
+          <thead>
+            <tr><th>Model</th><th>Val AUC</th><th>Test ROC-AUC (95% CI)</th><th>PR-AUC</th><th>Brier</th><th>Log loss</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="caption">
+        The shipped model is not the highest test score. Dropping voice scores 0.003 AUC higher,
+        inside the confidence interval; switching after seeing the test result would be test-set tuning.
+      </p>
+      <div class="chart-grid">
+        <div class="chart-card"><h3>ROC curves</h3><div id="rocChart" class="chart"></div></div>
+        <div class="chart-card"><h3>Calibration</h3><div id="calChart" class="chart"></div></div>
+      </div>
+      <div class="section-head">
+        <h2>Which modalities earn their place?</h2>
+        <p class="muted">Pre-call volatility does most of the work. Text has standalone signal but adds little incrementally; voice lowers test AUC.</p>
+      </div>
+      <div class="chart-card"><div id="ablationChart" class="chart chart-tall"></div></div>
+    </section>
+
+    <section class="panel" id="method" role="tabpanel">
+      <div class="prose-grid">
+        <div>
+          <h2>The question</h2>
+          <p>
+            Earnings calls are the densest unstructured signal a public company emits. This project asks a
+            narrow, testable version of a large question: <strong>does the way management speaks — and the
+            language they use — forecast how volatile the stock will be after the call?</strong>
+          </p>
+          <h2>Data</h2>
+          <p>
+            <strong>MAEC</strong> (CIKM 2020): 3,443 earnings calls from S&amp;P 1500 companies, each with a
+            transcript and 29 acoustic descriptors per segment. CC BY-SA 4.0; not redistributed here.
+            <strong>Prices</strong> come from yfinance, with SPY as the market benchmark.
+          </p>
+          <p>
+            <strong>Labels</strong> are the top tercile of post-call realised volatility, measured over the five
+            trading days after the call and market-adjusted against SPY. The threshold is learned on the training
+            period only. A post/pre ratio target was tested and rejected because it removes the predictable
+            volatility level.
+          </p>
+          <h2>Protocol</h2>
+          <p>
+            Time split: train 2015–2016, validation 2017 H1, test 2017 H2–2018 H1. No random splits.
+            Company-disjoint cross-validation is the robustness check, because the same firm appears repeatedly.
+            Text representations are fit on training data only, probabilities are isotonic-calibrated on validation,
+            and confidence intervals come from 1,000 bootstrap resamples of the test set.
+          </p>
+        </div>
+        <div>
+          <h2>What the ablation says</h2>
+          <p>
+            Pre-call volatility is a strong baseline (0.776 test AUC), because volatility clusters. Text alone
+            reaches 0.674, but adds only about 0.001 AUC on top of the baseline. Voice alone is 0.543 — close to
+            chance — and adding it lowers test AUC from 0.780 to 0.776.
+          </p>
+          <p>
+            FinBERT mean embeddings reach only 0.553 on their own, below TF-IDF, and they lower the single
+            LightGBM from 0.766 to 0.744. With 1,500 training calls, a 768-d generic vector is too wide for the
+            sample; the sparse lexical representation wins.
+          </p>
+          <h2>Limitations</h2>
+          <p>
+            The label is noisy: five-day realised volatility is affected by macro news unrelated to the call.
+            MAEC transcripts have no speaker labels, so Q&amp;A-specific acoustics are approximated, not isolated.
+            The corpus ends in 2018; modern calls, accents and audio quality may behave differently. This is a
+            research prototype, not investment advice.
+          </p>
+          <p class="muted">
+            Full code, tests and the model card:
+            <a href="https://github.com/imSheheryar/signal" target="_blank" rel="noreferrer">github.com/imSheheryar/signal</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Signal · a research prototype</span>
+    <span>MAEC corpus not redistributed · code MIT</span>
+  </footer>
+</body>
+</html>
