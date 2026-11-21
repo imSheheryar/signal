@@ -1,0 +1,12 @@
+.venv
+data
+artifacts/*.log
+artifacts/*.joblib
+artifacts/calls_*.parquet
+artifacts/prices_*.parquet
+artifacts/text_embeddings.parquet
+__pycache__
+*.pyc
+.git
+tests
+docs

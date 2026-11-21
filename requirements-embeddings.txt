@@ -1,0 +1,4 @@
+# Optional: only needed for embed_text.py (FinBERT features).
+# CPU wheels are sufficient; the embedding job takes about 30 minutes.
+transformers>=4.40
+torch>=2.2

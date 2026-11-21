@@ -1,0 +1,14 @@
+flowchart LR
+    A[MAEC transcripts<br/>3,443 calls] --> B[Text pipeline<br/>TF-IDF · SVD · FinBERT]
+    C[MAEC acoustic features<br/>29 descriptors per segment] --> D[Prosody pipeline<br/>aggregates · dynamics · deltas]
+    E[yfinance prices<br/>daily closes + SPY] --> F[Label builder<br/>market-adjusted post-call volatility]
+    B --> G[Text model<br/>logistic regression]
+    D --> H[Acoustic model<br/>LightGBM]
+    F --> I[Pre-vol baseline<br/>logistic regression]
+    G --> J[Late fusion stack]
+    H --> J
+    I --> J
+    J --> K[Isotonic calibration]
+    K --> L[FastAPI explorer]
+    K --> M[Streamlit dashboard]
+    K --> N[Evaluation report<br/>ROC · PR · calibration · ablations]

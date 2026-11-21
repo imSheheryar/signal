@@ -1,0 +1,9 @@
+{
+  "threshold": 0.2499996509714664,
+  "group_cv_auc_mean": 0.7383021874538341,
+  "group_cv_auc_std": 0.024375674086686557,
+  "n_train": 1497,
+  "n_val": 455,
+  "n_test": 449,
+  "embeddings": true
+}

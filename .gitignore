@@ -1,0 +1,15 @@
+.venv/
+data/maec/
+artifacts/*.parquet
+artifacts/*.joblib
+artifacts/*.log
+!artifacts/demo_calls.parquet
+!artifacts/demo_drivers.parquet
+!artifacts/demo_prosody.parquet
+!artifacts/test_predictions.parquet
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.ruff_cache/
+artifacts/*.png
